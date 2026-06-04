@@ -1,6 +1,8 @@
 import Image from 'next/image'
 import { BRAND_LOGOS } from '@/public/assets'
 
+const LARGE_LOGOS = new Set(['Apple', 'Intel', 'Xiaomi'])
+
 const STAGGER = [
   'stagger-0', 'stagger-1', 'stagger-2', 'stagger-3', 'stagger-4',
   'stagger-5', 'stagger-6', 'stagger-7', 'stagger-8', 'stagger-9',
@@ -25,7 +27,7 @@ export default function TrustedBrands() {
                 alt={logo.name}
                 width={100}
                 height={40}
-                className={`object-contain h-8 w-auto animate-breathe ${STAGGER[index]}`}
+                className={`object-contain w-auto animate-breathe ${STAGGER[index]} ${LARGE_LOGOS.has(logo.name) ? 'h-12' : 'h-8'}`}
               />
             </div>
           ))}

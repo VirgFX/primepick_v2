@@ -135,6 +135,7 @@
   50%       { opacity: 0.45; }
 }
 
+@utility scrollbar-hide   { scrollbar-width: none; &::-webkit-scrollbar { display: none; } }
 @utility animate-breathe  { animation: breathe 3s ease-in-out infinite; }
 @utility stagger-0         { animation-delay: 0s;   }
 @utility stagger-1         { animation-delay: 0.3s; }

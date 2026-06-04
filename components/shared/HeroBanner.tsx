@@ -30,7 +30,7 @@ export default function HeroBanner() {
 
       {/* iPhone — centered */}
       <div className="absolute inset-x-0 top-[2%] mx-auto w-56 h-[82%]">
-        <Image src={activeImage} alt="iPhone" fill sizes="224px" className="object-contain" />
+        <Image src={activeImage} alt="iPhone" fill sizes="224px" className="object-contain" priority  />
       </div>
 
       {/* Color selector */}

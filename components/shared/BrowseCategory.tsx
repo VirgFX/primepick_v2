@@ -1,104 +1,105 @@
+'use client'
+
+import { useRef, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { CATEGORIES } from '@/public/assets'
 
-function CategoryCard({
-  name,
-  image,
-  href,
-  sizes,
-  className = '',
-}: {
-  name: string
-  image: string
-  href: string
-  sizes: string
-  className?: string
-}) {
-  return (
-    <Link
-      href={href}
-      aria-label={`Browse ${name}`}
-      className={`relative overflow-hidden rounded-2xl bg-gray-100 block transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${className}`}
-    >
-      <Image
-        src={image}
-        alt={name}
-        fill
-        sizes={sizes}
-        className="object-cover"
-      />
-      <div className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-black/65 to-transparent" />
-      <span className="absolute bottom-3 left-4 text-white font-semibold text-sm tracking-wide drop-shadow">
-        {name}
-      </span>
-    </Link>
-  )
-}
+const DOT_COUNT = 3
 
 export default function BrowseCategory() {
-  const [phone, camera, headphone, watch, desktop, controller] = CATEGORIES
+  const trackRef = useRef<HTMLDivElement>(null)
+  const [activeDot, setActiveDot] = useState(0)
+
+  function scroll(dir: 'prev' | 'next') {
+    const track = trackRef.current
+    if (!track) return
+    track.scrollBy({ left: dir === 'next' ? track.clientWidth / 2 : -(track.clientWidth / 2), behavior: 'smooth' })
+  }
+
+  function onScroll() {
+    const track = trackRef.current
+    if (!track) return
+    const maxScroll = track.scrollWidth - track.clientWidth
+    if (maxScroll <= 0) return
+    setActiveDot(Math.round((track.scrollLeft / maxScroll) * (DOT_COUNT - 1)))
+  }
+
+  function scrollToDot(i: number) {
+    const track = trackRef.current
+    if (!track) return
+    const max = track.scrollWidth - track.clientWidth
+    track.scrollTo({ left: (max * i) / (DOT_COUNT - 1), behavior: 'smooth' })
+    setActiveDot(i)
+  }
 
   return (
     <section className="py-12 bg-white">
       <div className="max-w-7xl mx-auto px-4">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">Browse Categories</h2>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 lg:grid-rows-3 gap-3 lg:h-[520px]">
-          {/* Hero — Phone (spans 3 rows on lg) */}
-          <CategoryCard
-            name={phone.name}
-            image={phone.image}
-            href="#"
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className="sm:col-span-2 lg:col-span-1 lg:row-span-3 min-h-48"
-          />
-
-          {/* Camera */}
-          <CategoryCard
-            name={camera.name}
-            image={camera.image}
-            href="#"
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 22vw"
-            className="min-h-40 lg:col-start-2 lg:row-start-1"
-          />
-
-          {/* Headphones */}
-          <CategoryCard
-            name={headphone.name}
-            image={headphone.image}
-            href="#"
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 22vw"
-            className="min-h-40 lg:col-start-3 lg:row-start-1"
-          />
-
-          {/* Smartwatch */}
-          <CategoryCard
-            name={watch.name}
-            image={watch.image}
-            href="#"
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 22vw"
-            className="min-h-40 lg:col-start-2 lg:row-start-2"
-          />
-
-          {/* Desktop */}
-          <CategoryCard
-            name={desktop.name}
-            image={desktop.image}
-            href="#"
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 22vw"
-            className="min-h-40 lg:col-start-3 lg:row-start-2"
-          />
-
-          {/* Controller — wide card spanning 2 cols on lg */}
-          <CategoryCard
-            name={controller.name}
-            image={controller.image}
-            href="#"
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 45vw"
-            className="sm:col-span-2 lg:col-start-2 lg:col-span-2 lg:row-start-3 min-h-40"
-          />
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold text-gray-900">Browse by Categories</h2>
+          <div className="flex gap-2">
+            <button
+              onClick={() => scroll('prev')}
+              aria-label="Previous categories"
+              className="w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors"
+            >
+              <ChevronLeft className="w-4 h-4 text-gray-700" />
+            </button>
+            <button
+              onClick={() => scroll('next')}
+              aria-label="Next categories"
+              className="w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors"
+            >
+              <ChevronRight className="w-4 h-4 text-gray-700" />
+            </button>
+          </div>
         </div>
+
+        {/* Cards */}
+        <div
+          ref={trackRef}
+          onScroll={onScroll}
+          className="flex gap-3 overflow-x-auto scroll-smooth snap-x snap-mandatory scrollbar-hide"
+        >
+          {CATEGORIES.map((cat) => (
+            <Link
+              key={cat.slug}
+              href="#"
+              aria-label={`Browse ${cat.name}`}
+              className="snap-start shrink-0 w-44 rounded-2xl bg-orange-50 overflow-hidden hover:-translate-y-1 hover:shadow-md transition-all duration-300 block"
+            >
+              <div className="relative h-40 p-3">
+                <Image
+                  src={cat.image}
+                  alt={cat.name}
+                  fill
+                  sizes="176px"
+                  className="object-contain object-center p-3"
+                />
+              </div>
+              <p className="px-3 pt-2 pb-3 text-sm font-medium text-gray-800">{cat.name}</p>
+            </Link>
+          ))}
+        </div>
+
+        {/* Dot indicators */}
+        <div className="flex justify-center gap-2 mt-5">
+          {Array.from({ length: DOT_COUNT }).map((_, i) => (
+            <button
+              key={i}
+              onClick={() => scrollToDot(i)}
+              aria-label={`Go to slide ${i + 1}`}
+              className={`h-2 rounded-full transition-all duration-300 ${
+                i === activeDot ? 'w-6 bg-zinc-800' : 'w-2 bg-zinc-300'
+              }`}
+            />
+          ))}
+        </div>
+
       </div>
     </section>
   )
